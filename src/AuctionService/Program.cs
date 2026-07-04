@@ -19,4 +19,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Call the database initializer to seed the database
+try
+{
+    DbInitializer.InitDb(app);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"An error occurred while initializing the database: {ex.Message}");
+}
+
 app.Run();

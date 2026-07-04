@@ -1,0 +1,12 @@
+# command to run this: docker-compose up -d
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      - POSTGRES_PASSWORD=postgrespw
+    ports:
+      - 5432:5432 # ouside port:inside port
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
