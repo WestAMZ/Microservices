@@ -1,10 +1,9 @@
-namespace SearchService.Data;
-
 using System.Text.Json;
 using MongoDB.Driver;
 using MongoDB.Entities;
 using SearchService.Models;
 
+namespace SearchService.Data;
 public class DbInitializer
 {
     public static async Task InitDb(WebApplicationBuilder app)
