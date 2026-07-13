@@ -2,6 +2,7 @@ using System.Net;
 using MassTransit;
 using Polly;
 using Polly.Extensions.Http;
+using SearchService.Consumers;
 using SearchService.Data;
 using SearchService.Services;
 
@@ -10,10 +11,30 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddAutoMapper(
+    cfg => { },
+    AppDomain.CurrentDomain.GetAssemblies()
+);
+
 builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetPolicy());
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+
+    /*
+        KebabCaseEndpointNameFormatter
+        This formatter converts names to kebab-case, meaning lowercase words separated by hyphens.
+
+        For example:
+        AuctionCreatedConsumer
+
+        becomes
+        auction-created
+    */    
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureEndpoints(context);
