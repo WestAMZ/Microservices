@@ -24,6 +24,12 @@ public class AuctionCreatedConsumer : IConsumer<AuctionCreated>
         var db = await DB.InitAsync("SearchDb");
         var item = _mapper.Map<Item>(context.Message);
 
+        // Custom validation logic can be added here if needed, eg: we are not allowing items with Model == Foo
+        if (item.Model == "Foo")
+        {
+            throw new ArgumentException("We cannot sell car with name of Foo");
+        }
+
         await db.SaveAsync(item);
     }
 }
