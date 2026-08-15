@@ -52,7 +52,7 @@ internal static class HostingExtensions
         _ = builder.Services.AddRazorPages();
 
         _ = builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         _ = builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -101,6 +101,11 @@ internal static class HostingExtensions
         // see more at https://docs.duendesoftware.com/general/data-protection
         _ = builder.Services.AddDataProtection()
                    .SetApplicationName("IdentityServer");
+
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
 
         return builder.Build();
     }
