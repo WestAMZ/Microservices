@@ -56,7 +56,29 @@ services:
     depends_on:
       - mongodb
       - rabbitmq
-
+  identity-svc:
+    image: wmeza/identity-svc:latest
+    build:
+      context: .
+      dockerfile: src/IdentityService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+80
+      - ConnectionStrings__DefaultConnection=Server=postgres:5432;User Id=postgres;Password=postgrespw;Database=identity
+    ports:
+      - 5000:80
+    depends_on:
+      - postgres
+  gateway-svc:
+    image: wmeza/gateway-svc:latest
+    build:
+      context: .
+      dockerfile: src/GatewayService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+80
+    ports:
+      - 6001:80  
 volumes:
   pgdata:
   mongodata:
@@ -67,3 +89,4 @@ volumes:
 #   docker compose down -v
 # see docker containers runing
 #   docker ps
+#   Deploy process: docker build [service-name> eg: identity-svc]-> docker compose up -d
