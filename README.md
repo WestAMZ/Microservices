@@ -1,6 +1,6 @@
-# Carties
+# Carsties
 
-Carties is a .NET 10 microservices application for vehicle auctions. It exposes a single gateway for clients, uses an identity service for authentication, stores transactional auction data in PostgreSQL, maintains a searchable read model in MongoDB, and uses RabbitMQ for asynchronous integration events.
+Carsties is a .NET 10 microservices application for vehicle auctions. It exposes a single gateway for clients, uses an identity service for authentication, stores transactional auction data in PostgreSQL, maintains a searchable read model in MongoDB, and uses RabbitMQ for asynchronous integration events.
 
 ## Architecture
 
@@ -270,7 +270,7 @@ docker compose build auction-svc
 The `.slnx` solution contains all five projects and can be built with:
 
 ```bash
-dotnet build Carties.slnx
+dotnet build Carsties.slnx
 ```
 
 ## Configuration notes and current caveats
@@ -285,7 +285,7 @@ dotnet build Carties.slnx
 ## Repository layout
 
 ```text
-Carties.slnx
+Carsties.slnx
  docker-compose.yml
  src/
    AuctionService/      Auction API, EF Core model, consumers, migrations

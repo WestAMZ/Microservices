@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY Carties.slnx ./
+COPY Carsties.slnx ./
 COPY src/AuctionService/AuctionService.csproj ./src/AuctionService/
 COPY src/Contracts/Contracts.csproj ./src/Contracts/
 
