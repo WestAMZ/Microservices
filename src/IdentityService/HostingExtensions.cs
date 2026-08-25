@@ -72,6 +72,12 @@ internal static class HostingExtensions
                 {
                     options.Diagnostics.ChunkSize = 1024 * 1024 * 10; // 10 MB
                 }
+
+                // Added to solve issuer invalid error where 5000 was not recongnized inside docker as indentity-svc
+                if (builder.Environment.IsEnvironment("Docker"))
+                {
+                    options.IssuerUri = "http://localhost:5000";
+                }
             })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
