@@ -1,7 +1,7 @@
 import { AuctionCard } from "./AuctionCard";
 
 async function getData(){
-    const res = await fetch('http://localhost:6001/search');
+    const res = await fetch('http://localhost:6001/search?pageSize=10');
 
     if(!res.ok) throw new Error('Failed to fetch data');
 
