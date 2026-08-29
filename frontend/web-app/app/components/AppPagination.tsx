@@ -11,7 +11,7 @@ type Props = {
 export const AppPagination = ({ currentPage, pageCount, pageChanged }: Props) => {
     
     return (
-        <Pagination
+        <Pagination    
             currentPage={currentPage}
             onPageChange={e => pageChanged(e)}
             totalPages={pageCount}
