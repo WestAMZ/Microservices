@@ -1,12 +1,19 @@
 'use client'
 
 import { useParamsStore } from "@/hooks/userParamsStore"
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa"
 
 export const Search = () => {
     const setParams = useParamsStore(state => state.setParams);
+    const searchTerm = useParamsStore(state => state.searchTerm);
     const [value, setValue] = useState('');
+
+    useEffect(()=>{
+        if(searchTerm  === ''){
+            setValue('');
+        }
+    },[searchTerm]);
 
     function handleChange(e: ChangeEvent<HTMLInputElement>){
         setValue(e.target.value);
