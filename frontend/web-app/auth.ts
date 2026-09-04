@@ -18,6 +18,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // Callbacks allow you to control what happens when a user signs in, signs out, or when a session is created or updated. 
   // You can use these callbacks to customize the behavior of your authentication flow.
   callbacks:{
+    async authorized({ auth }){
+      return !!auth;
+    },
     async jwt({ token, profile }) {
       
       if(profile){
