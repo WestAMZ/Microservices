@@ -7,6 +7,7 @@ Carsties is a .NET 10 microservices application for vehicle auctions. It exposes
 ```mermaid
 flowchart LR
     Client[Web client / Postman]
+    Frontend[frontend/web-app\nNext.js web client]
     Gateway[GatewayService\nYARP reverse proxy]
     Identity[IdentityService\nDuende IdentityServer + ASP.NET Identity]
     Auction[AuctionService\nAuction API]
@@ -17,6 +18,8 @@ flowchart LR
 
     Client --> Gateway
     Client --> Identity
+    Frontend --> Gateway
+    Frontend --> Identity
     Gateway -->|/auctions| Auction
     Gateway -->|/search| Search
     Gateway -. JWT authority .-> Identity
@@ -66,6 +69,31 @@ Responsibilities and API behavior:
 - Authenticated `DELETE /api/auctions/{id}` deletes an auction owned by the current user and publishes `AuctionDeleted`.
 - Database initialization and seed data are handled by `Data/DbInitializer.cs`.
 - Consumers handle `BidPlaced`, `AuctionFinished`, and MassTransit fault messages. These support auction-side reactions to asynchronous events.
+
+### frontend/web-app
+
+Path: `frontend/web-app`
+
+The frontend is a private Next.js application that provides the browser client for Carsties Auctions. It uses the App Router and React to render auction listings, search and filtering controls, auction detail and management views, navigation, and session-aware user actions.
+
+Main libraries:
+
+- **Next.js 16:** provides the application runtime, App Router, server actions, and API routes.
+- **React 19:** renders the interactive auction experience.
+- **NextAuth:** integrates the frontend with the Duende IdentityServer provider and exposes the signed-in user's access token to the application.
+- **Zustand:** stores client-side listing parameters such as search and filter state.
+- **Flowbite React and React Icons:** provide UI components and icons.
+- **TypeScript:** provides static typing for the frontend code.
+
+Responsibilities and application behavior:
+
+- Renders the auction listing page and retrieves search results through the GatewayService `/search` route.
+- Provides search, paging, sorting, and status filters for auction listings.
+- Supports authenticated session flows through the IdentityService `nextApp` OpenID Connect client.
+- Uses the GatewayService `/auctions` routes for authenticated auction operations.
+- Protects the session page through the Next.js proxy and NextAuth authorization callbacks.
+
+The frontend runs independently from the .NET Compose services. Its local development server listens on `http://localhost:3000` and expects the gateway and identity endpoints to be available on their published host ports.
 
 ### SearchService
 
@@ -153,10 +181,10 @@ The services share this project so publishers and consumers use the same namespa
 
 ```mermaid
 graph TD
+    Frontend[frontend/web-app] --> Gateway[GatewayService]
+    Frontend --> Identity[IdentityService]
     Auction[AuctionService] --> Contracts[Contracts]
     Search[SearchService] --> Contracts
-    Gateway[GatewayService]
-    Identity[IdentityService]
     Auction -->|HTTP JWT authority| Identity
     Gateway -->|JWT authority| Identity
     Search -->|HTTP sync client| Auction
@@ -170,6 +198,8 @@ The project references are intentionally one-way:
 - `GatewayService` has no project reference.
 - `IdentityService` has no project reference.
 - `Contracts` has no project references.
+
+The frontend has no compile-time project reference to the .NET solution. At runtime it calls GatewayService over HTTP for auction and search data and uses IdentityService for OpenID Connect authentication.
 
 Runtime dependencies are broader than compile-time references. AuctionService and SearchService communicate through RabbitMQ, SearchService calls AuctionService over HTTP for synchronization, and both the gateway and AuctionService use IdentityService as their JWT authority.
 
@@ -234,6 +264,8 @@ Compose also defines:
 
 Inside the Compose network, services must use service names such as `postgres`, `mongodb`, `rabbitmq`, `auction-svc`, and `identity-svc`; `localhost` refers to the current container, not another service.
 
+The frontend is not included in Docker Compose. Run it from `frontend/web-app` with Node.js and npm while the backend Compose services are running.
+
 ## Running the application
 
 Prerequisites:
@@ -249,11 +281,20 @@ docker compose up -d
 
 Useful endpoints:
 
+- Frontend: `http://localhost:3000`
 - Gateway: `http://localhost:6001`
 - IdentityServer: `http://localhost:5000`
 - AuctionService direct API: `http://localhost:7001/api/auctions`
 - SearchService direct API: `http://localhost:7002/api/search`
 - RabbitMQ management UI: `http://localhost:15672`
+
+Start the frontend in a separate terminal:
+
+```bash
+cd frontend/web-app
+npm install
+npm run dev
+```
 
 Stop the stack and remove its persisted volumes:
 
@@ -293,4 +334,6 @@ Carsties.slnx
    IdentityService/     IdentityServer, ASP.NET Identity, Razor Pages
    GatewayService/      YARP reverse proxy and gateway authentication
    Contracts/           Shared MassTransit event contracts
+frontend/
+    web-app/              Next.js browser client for auction listings and user sessions
 ```
